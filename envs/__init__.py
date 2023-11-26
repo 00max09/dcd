@@ -5,3 +5,4 @@
 # LICENSE file in the root directory of this source tree.
 
 from .multigrid.adversarial import *
+from .sokoban.adversarial import *

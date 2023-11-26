@@ -1,7 +1,7 @@
 import gym
 import numpy as np
 from . import register
-
+from gym_sokoban.envs.sokoban_env_fast import SokobanEnvFast
 
 class SokobanAdversarialEnv(SokobanEnvFast):
     def __init__(self, dim_room=(10, 10),
@@ -155,7 +155,7 @@ class SokobanAdversarialEnv(SokobanEnvFast):
           if(self.game_start_room[x][y][FieldStates.wall] == 1) :
             self.game_start_room[x][y][FieldStates.wall] = 0
             self.game_start_room[x][y][FieldStates.empty] = 1
-          else if (self.game_start_room[x][y][FieldStates.empty] == 1):
+          elif (self.game_start_room[x][y][FieldStates.empty] == 1):
             self.game_start_room[x][y][FieldStates.wall] = 1
             self.game_start_room[x][y][FieldStates.empty] = 0
   
@@ -177,7 +177,7 @@ class SokobanAdversarialEnv(SokobanEnvFast):
         return obs
 
 
-class MediumSokobanAdversarialEnv(AdversarialEnv):
+class MediumSokobanAdversarialEnv(SokobanAdversarialEnv):
   def __init__(self):
     super().__init__(dim_room=(10, 10),
                  max_steps=240,
