@@ -302,6 +302,34 @@ class AdversarialRunner(object):
 
         return stats
 
+    def _get_env_stats_multigrid(self, agent_info, adversary_agent_info):
+        num_blocks = np.mean(agent_info.get(
+            'num_blocks', self.venv.get_num_blocks()))
+        
+        passable_ratio = np.mean(agent_info.get(
+            'passable_ratio', self.venv.get_passable()))
+
+
+        solved_idx =  agent_info.get('solved_idx', None)
+        if solved_idx is None:
+            if 'max_returns' in adversary_agent_info:
+                solved_idx = \
+                    (torch.max(agent_info['max_return'], \
+                        adversary_agent_info['max_return']) > 0).numpy().squeeze()
+            else:
+                solved_idx = (agent_info['max_return'] > 0).numpy().squeeze()
+
+       # solved_path_length = np.mean(solved_path_lengths) if len(solved_path_lengths) > 0 else 0
+
+        stats = {
+            'num_blocks': num_blocks,
+            'passable_ratio': passable_ratio,
+          #  'shortest_path_length': shortest_path_length,
+          #  'solved_path_length': solved_path_length
+        }
+
+        return stats
+
     def _get_plr_buffer_stats(self):
         stats = {}
         for k,sampler in self.level_samplers.items():
@@ -349,6 +377,8 @@ class AdversarialRunner(object):
             stats = self._get_env_stats_car_racing(agent_info, adversary_agent_info)
         elif env_name.startswith('BipedalWalker'):
             stats = self._get_env_stats_bipedalwalker(agent_info, adversary_agent_info)
+        elif env_name.startswith('Sokoban'):
+            stats = self._get_env_stats_sokoban(agent_info, adversary_agent_info)
         else:
             raise ValueError(f'Unsupported environment, {self.args.env_name}')
 

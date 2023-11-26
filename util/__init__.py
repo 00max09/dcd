@@ -177,6 +177,13 @@ def _make_env(args):
             env = TimeLimit(MultiGridFullyObsWrapper(env),
                 max_episode_steps=max_episode_steps)
         return env
+    elif args.env_name.startswith('Sokoban'):
+        env = gym_make(args.env_name, **env_kwargs)
+        if args.use_global_critic or args.use_global_policy:
+            max_episode_steps = env._max_episode_steps
+            env = TimeLimit(MultiGridFullyObsWrapper(env),
+                max_episode_steps=max_episode_steps)
+        return env
     else:
         return gym_make(args.env_name, **env_kwargs)
 
@@ -185,7 +192,7 @@ def create_parallel_env(args, adversary=True):
     is_multigrid = args.env_name.startswith('MultiGrid')
     is_car_racing = args.env_name.startswith('CarRacing')
     is_bipedalwalker = args.env_name.startswith('BipedalWalker')
-
+    is_sokoban = args.env_name.startswith("Sokoban")
     make_fn = lambda: _make_env(args)
 
     venv = ParallelAdversarialVecEnv([make_fn]*args.num_processes, adversary=adversary)
@@ -208,7 +215,7 @@ def create_parallel_env(args, adversary=True):
     venv = VecPreprocessImageWrapper(venv=venv, obs_key=obs_key,
             transpose_order=transpose_order, scale=scale)
 
-    if is_multigrid or is_bipedalwalker:
+    if is_multigrid or is_bipedalwalker or is_sokoban:
         ued_venv = venv
 
     if args.singleton_env:
@@ -221,7 +228,7 @@ def create_parallel_env(args, adversary=True):
 
 
 def is_dense_reward_env(env_name):
-    if env_name.startswith('CarRacing'):
+    if env_name.startswith('CarRacing') or env_name.startswith("Sokoban"):
         return True
     else:
         return False

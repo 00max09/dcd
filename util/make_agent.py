@@ -57,6 +57,51 @@ def model_for_multigrid_agent(
 
     return model
 
+def model_for_multigrid_agent(
+    env,
+    agent_type='agent',
+    recurrent_arch=None,
+    recurrent_hidden_size=256,
+    use_global_critic=False,
+    use_global_policy=False):
+    if agent_type == 'adversary_env':
+        adversary_observation_space = env.adversary_observation_space
+        adversary_action_space = env.adversary_action_space
+        adversary_max_timestep = adversary_observation_space['time_step'].high[0] + 1
+        adversary_random_z_dim = adversary_observation_space['random_z'].shape[0]
+
+        model = MultigridNetwork(
+            observation_space=adversary_observation_space, 
+            action_space=adversary_action_space,
+            conv_filters=128,
+            scalar_fc=10,
+            scalar_dim=adversary_max_timestep,
+            random_z_dim=adversary_random_z_dim,
+            recurrent_arch=recurrent_arch,
+            recurrent_hidden_size=recurrent_hidden_size)
+    else:
+        observation_space = env.observation_space
+        action_space = env.action_space
+        num_directions = observation_space['direction'].high[0] + 1 
+        model_kwargs = dict(
+            observation_space=observation_space, 
+            action_space=action_space,
+            scalar_fc=5,
+            scalar_dim=num_directions,
+            recurrent_arch=recurrent_arch,
+            recurrent_hidden_size=recurrent_hidden_size)
+
+        model_constructor = MultigridNetwork
+        if use_global_critic:
+            model_constructor = MultigridGlobalCriticNetwork
+
+        if use_global_policy:
+            model_kwargs.update({'use_global_policy': True})
+
+        model = model_constructor(**model_kwargs)
+
+    return model
+
 def model_for_car_racing_agent(
     env,
     agent_type='agent',
@@ -151,6 +196,14 @@ def model_for_env_agent(
             env=env,
             agent_type=agent_type,
             recurrent_arch=recurrent_arch)
+    elif env_name.startswith("Sokoban"):
+        model = model_for_multigrid_agent(
+            env=env, 
+            agent_type=agent_type,
+            recurrent_arch=recurrent_arch,
+            recurrent_hidden_size=recurrent_hidden_size,
+            use_global_critic=use_global_critic,
+            use_global_policy=use_global_policy)
     else:
         raise ValueError(f'Unsupported environment {env_name}.')
 
