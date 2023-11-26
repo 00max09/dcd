@@ -1,4 +1,6 @@
+import gym
 import numpy as np
+from . import register
 
 
 class SokobanAdversarialEnv(SokobanEnvFast):
@@ -173,3 +175,24 @@ class SokobanAdversarialEnv(SokobanEnvFast):
 
         
         return obs
+
+
+class MediumSokobanAdversarialEnv(AdversarialEnv):
+  def __init__(self):
+    super().__init__(dim_room=(10, 10),
+                 max_steps=240,
+                 num_boxes=1,
+                 n_clutter=30
+                 )
+
+if hasattr(__loader__, 'name'):
+  module_path = __loader__.name
+elif hasattr(__loader__, 'fullname'):
+  module_path = __loader__.fullname
+
+
+register.register(
+    env_id='Sokoban-Adversarial-v0',
+    entry_point=module_path + ':MediumSokobanAdversarialEnv',
+    max_episode_steps=250,
+)
