@@ -45,6 +45,10 @@ class SokobanAdversarialEnv(SokobanEnvFast):
     def processed_action_dim(self):
       return 1       
 
+    @property
+    def encoding(self):
+      return self._internal_state.get_np_array_version()
+
     def generate_default_room(self):
         """
         Generates basic empty Sokoban room with one box, represented by an integer matrix.
