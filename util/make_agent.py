@@ -10,7 +10,8 @@ from models import \
     CarRacingNetwork, \
     CarRacingBezierAdversaryEnvNetwork, \
     BipedalWalkerStudentPolicy, \
-    BipedalWalkerAdversaryPolicy
+    BipedalWalkerAdversaryPolicy, \
+    SokobanNetwork
 
 def model_for_multigrid_agent(
     env,
@@ -57,20 +58,23 @@ def model_for_multigrid_agent(
 
     return model
 
-def model_for_multigrid_agent(
+def model_for_sokoban_agent(
     env,
     agent_type='agent',
     recurrent_arch=None,
     recurrent_hidden_size=256,
     use_global_critic=False,
     use_global_policy=False):
+    
     if agent_type == 'adversary_env':
         adversary_observation_space = env.adversary_observation_space
         adversary_action_space = env.adversary_action_space
         adversary_max_timestep = adversary_observation_space['time_step'].high[0] + 1
         adversary_random_z_dim = adversary_observation_space['random_z'].shape[0]
-
-        model = MultigridNetwork(
+        print(adversary_observation_space)
+        print( "             " + "ADVERSARY")
+        
+        model = SokobanNetwork(
             observation_space=adversary_observation_space, 
             action_space=adversary_action_space,
             conv_filters=128,
@@ -80,9 +84,14 @@ def model_for_multigrid_agent(
             recurrent_arch=recurrent_arch,
             recurrent_hidden_size=recurrent_hidden_size)
     else:
-        observation_space = env.observation_space
+        
+        observation_space =spaces.Dict({
+            'image': env.observation_space
+        }) 
         action_space = env.action_space
-        num_directions = observation_space['direction'].high[0] + 1 
+        num_directions = 8
+        print(observation_space)
+        print("             " + "NOT ADVERSARY")
         model_kwargs = dict(
             observation_space=observation_space, 
             action_space=action_space,
@@ -91,9 +100,9 @@ def model_for_multigrid_agent(
             recurrent_arch=recurrent_arch,
             recurrent_hidden_size=recurrent_hidden_size)
 
-        model_constructor = MultigridNetwork
+        model_constructor = SokobanNetwork
         if use_global_critic:
-            model_constructor = MultigridGlobalCriticNetwork
+            model_constructor = SokobanNetwork
 
         if use_global_policy:
             model_kwargs.update({'use_global_policy': True})
@@ -197,7 +206,7 @@ def model_for_env_agent(
             agent_type=agent_type,
             recurrent_arch=recurrent_arch)
     elif env_name.startswith("Sokoban"):
-        model = model_for_multigrid_agent(
+        model = model_for_sokoban_agent(
             env=env, 
             agent_type=agent_type,
             recurrent_arch=recurrent_arch,

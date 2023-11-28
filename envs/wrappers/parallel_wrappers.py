@@ -92,6 +92,7 @@ def worker(remote, parent_remote, env_fn_wrappers):
                 else:
                     remote.send([attr for attr in attrs])
             else:
+                print(cmd + " NOT IMPLEMENTED: :(")
                 raise NotImplementedError
     except KeyboardInterrupt:
         print('SubprocVecEnv worker: got KeyboardInterrupt')
@@ -140,6 +141,7 @@ class SubprocVecEnv(VecEnv):
         self.is_eval = is_eval
         self.processed_action_dim = 1
         if not is_eval:
+            print("XDDXDXDXDXDXD")
             self.remotes[0].send(('processed_action_dim', None))
             self.processed_action_dim = self.remotes[0].recv()[0]
 
