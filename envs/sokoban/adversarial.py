@@ -13,6 +13,7 @@ class SokobanAdversarialEnv(SokobanEnvFast):
                  seed=0):
 
       ## at least 5x5 map
+      print("WTRF")
       super().__init__(dim_room=dim_room, max_steps=120, num_boxes=4, seed = seed)
       self.game_start_room = self.generate_default_room()
       self.restore_full_state_from_np_array_version(self.game_start_room)
@@ -30,7 +31,7 @@ class SokobanAdversarialEnv(SokobanEnvFast):
       self.adversary_image_obs_space = gym.spaces.Box(
         low=0,
         high=255,
-        shape=(self.dim_room[0], self.dim_room[1], 3),
+        shape=(self.dim_room[0], self.dim_room[1], 7),
         dtype='uint8')
 
       # Adversary observations are dictionaries containing an encoding of the
@@ -66,7 +67,8 @@ class SokobanAdversarialEnv(SokobanEnvFast):
         room[2][2][FieldStates.player] = 1
         room[3][3][FieldStates.box] = 1
         room[4][4][FieldStates.box_target] = 1
-      
+        print("SDGFSGDFGFGF")
+        print(room)
         return room
 
     def reset_agent(self):

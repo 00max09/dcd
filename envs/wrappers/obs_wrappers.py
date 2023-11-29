@@ -83,6 +83,7 @@ class VecPreprocessImageWrapper(VecEnvWrapper):
 		if len(obs.shape) == len(self.batch_transpose_order):
 			return obs.transpose(*self.batch_transpose_order)
 		else:
+			print(obs)
 			return obs.transpose(*self.transpose_order)
 
 	def _preprocess(self, obs, obs_key=None):
